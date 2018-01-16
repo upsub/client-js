@@ -73,7 +73,7 @@ export default class Client extends EventEmitter {
       ['upsub-app-id', this._options.appID],
       ['upsub-public', this._options.public],
       ['upsub-secret', this._options.secret],
-      ['upsub-connection-name', this._options.name],
+      ['upsub-connection-name', this._options.name]
     ]
 
     const createQuery = (keys, [key, value]) => (
@@ -212,6 +212,10 @@ export default class Client extends EventEmitter {
     if (channels.length === 0) {
       this.unsubscribe(...this.subscriptions)
       return
+    }
+
+    for (const channel of channels) {
+      this.off(channel)
     }
 
     this._sendMessage(Message.unsubscribe(...channels))

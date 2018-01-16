@@ -104,7 +104,7 @@ export default class Message {
    */
   static subscribe (...channels) {
     const headers = {
-      'upsub-message-type': Message.SUBSCRIBE,
+      'upsub-message-type': Message.SUBSCRIBE
     }
     return new Message(headers, channels.join(','))
   }
@@ -163,5 +163,4 @@ export default class Message {
   static get PONG () {
     return 'pong'
   }
-
 }

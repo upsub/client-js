@@ -11,6 +11,11 @@ beforeEach(() => {
     name: 'dev'
   })
 
+  client.on('connect', () => {
+    const myChannel = client.subscribe('my-channel', 'hello')
+    myChannel.unsubscribe()
+    console.log(myChannel._channels, client.subscriptions)
+  })
 })
 
 afterEach(() => {

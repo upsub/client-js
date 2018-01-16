@@ -42,7 +42,7 @@ export default class NativeWebSocket extends EventEmitter {
    * Listen for websocket events
    * @return {[type]} [description]
    */
-  _listen() {
+  _listen () {
     this._connection.onopen = event => this.emit('open', event)
     this._connection.onmessage = event => this.emit('message', event)
     this._connection.onclose = event => this.emit('close', event)
@@ -54,7 +54,7 @@ export default class NativeWebSocket extends EventEmitter {
    * @param  {String} message
    */
   send (message) {
-    this._connection.send(messsage)
+    this._connection.send(message)
   }
 
   /**
