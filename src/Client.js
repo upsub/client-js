@@ -1,6 +1,6 @@
 import WebSocket from 'ws'
 import Channel from './Channel'
-import Message from './message'
+import Message from './Message'
 import EventEmitter from 'events'
 
 /**
