@@ -8,7 +8,7 @@
     "test:watch": "jest --watch",
     "lint": "standard | snazzy; exit 0",
     "lint:fix": "standard --fix | snazzy; exit 0",
-    "build": "npm run build:lib && npm run build:browser",
+    "build": "export NODE_ENV=production && npm run build:lib && npm run build:browser && unset NODE_ENV",
     "build:lib": "babel src/ -D -d ./lib --plugins=transform-es2015-modules-commonjs; exit 0",
     "build:browser": "rollup -c && uglifyjs dist/client.js -m -o dist/client.min.js",
     "build:watch": "babel src/ -D -d ./lib --watch",

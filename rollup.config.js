@@ -1,7 +1,6 @@
-import builtins from 'rollup-plugin-node-builtins'
 import babel from 'rollup-plugin-babel'
-import commonjs from 'rollup-plugin-commonjs'
 import alias from 'rollup-plugin-alias'
+import builtins from 'rollup-plugin-node-builtins'
 
 export default {
   input: 'src/index.js',
@@ -12,7 +11,6 @@ export default {
   },
   plugins: [
     builtins(),
-    commonjs(),
     babel({
       exclude: 'node_modules/**'
     }),

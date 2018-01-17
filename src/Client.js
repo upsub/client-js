@@ -44,6 +44,7 @@ export default class Client extends EventEmitter {
     this._options.reconnectionAttemps = options.reconnectionAttemps
     this._options.reconnectionDelay = options.reconnectionDelay || 2000
     this._options.pingInterval = options.pingInterval || 30000
+    this._options.pongTimeout = options.pongTimeout || 30000
   }
 
   /**
@@ -70,7 +71,7 @@ export default class Client extends EventEmitter {
     ]
 
     const createQuery = (keys, [key, value]) => (
-      value ? keys.concat(`${key}=${value}`) : keys
+      value ? keys.concat(`${key}=${encodeURIComponent(value)}`) : keys
     )
 
     return `?${query.reduce(createQuery, []).join('&')}`
