@@ -8,24 +8,20 @@ export default class Channel {
   constructor (channels, client) {
     this._client = client
     this._channels = channels
+    this._subscriptions = []
   }
 
   /**
    * Register channel and listen for messages
-   * @param  {String|Function} channel
-   * @param  {Function|undefined} listener
+   * @param  {String} channel
+   * @param  {Function} listener
    * @return {Channel}
    */
   on (channel, listener) {
-    if (listener === undefined) {
-      listener = channel
-      channel = ''
-    }
-
     for (const prefix of this._channels) {
-      const chan = `${prefix}/${channel}`
-      this._channels.push(`${prefix}/${channel}`)
-      this._client.on(chan, listener)
+      const c = `${prefix}/${channel}`
+      this._subscriptions.push(c)
+      this._client.on(c, listener)
     }
 
     return this
@@ -38,6 +34,9 @@ export default class Channel {
    */
   off (channel) {
     for (const prefix of this._channels) {
+      this._subscriptions = this._subscriptions.filter(
+        c => c !== `${prefix}/${channel}`
+      )
       this._client.off(`${prefix}/${channel}`)
     }
 
@@ -57,9 +56,17 @@ export default class Channel {
 
   /**
    * Unsubscribe from channel and remove all its event listeners
-   * @return {[type]} [description]
    */
   unsubscribe () {
-    this._client.unsubscribe(...this._channels)
+    this._client._unsubscribe(...this._subscriptions)
+    this._subscriptions = []
+  }
+
+  /**
+   * Get the channel subscriptions
+   * @return {Array} of channels
+   */
+  get subscriptions () {
+    return this._subscriptions
   }
 }

@@ -6,10 +6,11 @@ import EventEmitter from 'events'
 /**
  * WebSocket States
  */
-const CONNECTING = 'connecting'
-const CONNECTED = 'connected'
-const CLOSING = 'closing'
-const CLOSED = 'closed'
+const CONNECTING = 0
+const CONNECTED = 1
+const CLOSING = 2
+const CLOSED = 3
+const RESERVED_CHANNELS = ['connect', 'disconnect', 'error', 'subscribe', 'unsubscribe']
 
 export default class Client extends EventEmitter {
   /**
@@ -26,12 +27,6 @@ export default class Client extends EventEmitter {
     this._state = CLOSED
     this._connection = null
     this._connectionAttemps = 0
-
-    this._deps = {
-      WebSocket: deps.WebSocket || WebSocket,
-      Channel: deps.Channel || Channel
-    }
-
     this._setDefaultOptions(options)
     this._connect()
   }
@@ -47,17 +42,16 @@ export default class Client extends EventEmitter {
     this._options.public = options.public
     this._options.secret = options.secret
     this._options.subprotocol = options.subprotocol
-    this.reconnectionAttemps = options.reconnectionAttemps
-    this.reconnectionDelay = options.reconnectionDelay || 2000
-    this.pingInterval = options.pingInterval || 30000
+    this._options.reconnectionAttemps = options.reconnectionAttemps
+    this._options.reconnectionDelay = options.reconnectionDelay || 2000
+    this._options.pingInterval = options.pingInterval || 30000
   }
 
   /**
    * Establish a new connection to the websocket server
    */
   _connect () {
-    this._state = CONNECTING
-    this._connection = new this._deps.WebSocket(
+    this._connection = new WebSocket(
       this._host + this._createQueryString()
     )
     this._connectionAttemps++
@@ -91,6 +85,7 @@ export default class Client extends EventEmitter {
     this._connection.on('message', this._onMessage.bind(this))
     this._connection.on('close', this._onClose.bind(this))
     this._connection.on('error', this._onError.bind(this))
+    this.on('error', () => {})
   }
 
   /**
@@ -98,7 +93,6 @@ export default class Client extends EventEmitter {
    * @param  {Object} event
    */
   _onOpen (event) {
-    this._state = CONNECTED
     this.emit('connect', event)
   }
 
@@ -120,7 +114,7 @@ export default class Client extends EventEmitter {
       return
     }
 
-    this.emit(message.headers['upsub-channel'], message.payload, message.headers)
+    this.emit(message.headers['upsub-channel'], message.payload)
   }
 
   /**
@@ -128,7 +122,6 @@ export default class Client extends EventEmitter {
    * @param  {Object} event
    */
   _onClose (event) {
-    this._state = CLOSED
     this.emit('disconnect', event)
   }
 
@@ -138,13 +131,6 @@ export default class Client extends EventEmitter {
    */
   _onError (event) {
     this.emit('error', event)
-  }
-
-  /**
-   * Send a ping message to the server
-   */
-  ping () {
-    this._sendMessage(Message.ping())
   }
 
   /**
@@ -160,6 +146,13 @@ export default class Client extends EventEmitter {
   }
 
   /**
+   * Send a ping message to the server
+   */
+  ping () {
+    this._sendMessage(Message.ping())
+  }
+
+  /**
    * Register channel and listen for messages
    * @param  {String} channel
    * @param  {Function} listener
@@ -172,8 +165,11 @@ export default class Client extends EventEmitter {
       this._events[channel] = [listener]
     }
 
-    if (!this._subscriptions.includes(channel)) {
-      this.subscribe(channel)
+    if (
+      !this._subscriptions.includes(channel) &&
+      !RESERVED_CHANNELS.includes(channel)
+    ) {
+      this._subscribe(channel)
     }
 
     return this
@@ -187,7 +183,7 @@ export default class Client extends EventEmitter {
   off (channel) {
     if (this._events[channel]) {
       delete this._events[channel]
-      this.unsubscribe(channel)
+      this._unsubscribe(channel)
     }
 
     return this
@@ -196,19 +192,17 @@ export default class Client extends EventEmitter {
   /**
    * Subscribe to channels
    * @param  {String} channels
-   * @return {Channel}
    */
-  subscribe (...channels) {
+  _subscribe (...channels) {
     this._sendMessage(Message.subscribe(...channels))
     this._subscriptions = this._subscriptions.concat(channels)
-    return new Channel(channels, this)
   }
 
   /**
    * unsubscribe to channels
    * @param  {String} channels
    */
-  unsubscribe (...channels) {
+  _unsubscribe (...channels) {
     if (channels.length === 0) {
       this.unsubscribe(...this.subscriptions)
       return
@@ -222,6 +216,15 @@ export default class Client extends EventEmitter {
     this._subscriptions = this._subscriptions.filter(
       sub => !channels.find(chan => chan === sub)
     )
+  }
+
+  /**
+   * Should create a new channel
+   * @param  {String} channels
+   * @return {Channel}
+   */
+  channel (...channels) {
+    return new Channel(channels, this)
   }
 
   /**
@@ -239,7 +242,6 @@ export default class Client extends EventEmitter {
    * @param  {String} reason
    */
   close (code, reason) {
-    this._state = CLOSING
     this._connection.close(code, reason)
   }
 
@@ -248,7 +250,7 @@ export default class Client extends EventEmitter {
    * @return {Boolean}
    */
   get isConnecting () {
-    return this._state === CONNECTING
+    return this._connection.readyState === CONNECTING
   }
 
   /**
@@ -256,7 +258,7 @@ export default class Client extends EventEmitter {
    * @return {Boolean}
    */
   get isConnected () {
-    return this._state === CONNECTED
+    return this._connection.readyState === CONNECTED
   }
 
   /**
@@ -264,7 +266,7 @@ export default class Client extends EventEmitter {
    * @return {Boolean}
    */
   get isClosing () {
-    return this._state === CLOSING
+    return this._connection.readyState === CLOSING
   }
 
   /**
@@ -272,7 +274,7 @@ export default class Client extends EventEmitter {
    * @return {Boolean}
    */
   get isClosed () {
-    return this._state === CLOSED
+    return this._connection.readyState === CLOSED
   }
 
   /**

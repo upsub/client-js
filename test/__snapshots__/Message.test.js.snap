@@ -1,0 +1,101 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`Should create a batch message 1`] = `
+Message {
+  "headers": Object {
+    "upsub-message-type": "batch",
+  },
+  "payload": Array [
+    Message {
+      "headers": Object {},
+      "payload": undefined,
+    },
+  ],
+}
+`;
+
+exports[`Should create a new message 1`] = `
+Message {
+  "headers": Object {
+    "header-key": "value",
+  },
+  "payload": Object {
+    "key": "value",
+  },
+}
+`;
+
+exports[`Should create a ping message 1`] = `
+Message {
+  "headers": Object {
+    "upsub-message-type": "ping",
+  },
+  "payload": undefined,
+}
+`;
+
+exports[`Should create a pong message 1`] = `
+Message {
+  "headers": Object {
+    "upsub-message-type": "pong",
+  },
+  "payload": undefined,
+}
+`;
+
+exports[`Should create a subscribe message 1`] = `
+Message {
+  "headers": Object {
+    "upsub-message-type": "subscribe",
+  },
+  "payload": "channel",
+}
+`;
+
+exports[`Should create a subscribe message 2`] = `
+Message {
+  "headers": Object {
+    "upsub-message-type": "subscribe",
+  },
+  "payload": "channel,channel-2",
+}
+`;
+
+exports[`Should create a text message 1`] = `
+Message {
+  "headers": Object {
+    "upsub-channel": "channel",
+    "upsub-message-type": "text",
+  },
+  "payload": "data",
+}
+`;
+
+exports[`Should create an unsubscribe message 1`] = `
+Message {
+  "headers": Object {
+    "upsub-message-type": "unsubscribe",
+  },
+  "payload": "channel",
+}
+`;
+
+exports[`Should create an unsubscribe message 2`] = `
+Message {
+  "headers": Object {
+    "upsub-message-type": "unsubscribe",
+  },
+  "payload": "channel,channel-2",
+}
+`;
+
+exports[`Should encode message to string format 1`] = `"{\\"headers\\":{\\"header-key\\":\\"header-value\\"},\\"payload\\":\\"\\\\\\"data\\\\\\"\\"}"`;
+
+exports[`Should parse a string and create a new message 1`] = `
+Message {
+  "headers": Object {
+    "upsub-message-type": "text",
+  },
+  "payload": "data",
+}
+`;

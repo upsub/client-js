@@ -37,13 +37,21 @@ export default class Message {
   }
 
   /**
+   * Message representation in string format
+   * @return {String}
+   */
+  toString () {
+    return this.encode()
+  }
+
+  /**
    * Decode message and create Message object from it
    * @param  {String} message
    * @return {Message}
    */
   static decode (message) {
-    const { headers, payload } = JSON.parse(message)
-    return new Message(headers, payload)
+    const { headers, payload = null } = JSON.parse(message)
+    return new Message(headers, JSON.parse(payload))
   }
 
   /**

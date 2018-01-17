@@ -1,0 +1,27 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`Should set options 1`] = `
+Object {
+  "appID": undefined,
+  "name": undefined,
+  "pingInterval": 30000,
+  "public": undefined,
+  "reconnectionAttemps": undefined,
+  "reconnectionDelay": 2000,
+  "secret": undefined,
+  "subprotocol": undefined,
+}
+`;
+
+exports[`Should set options 2`] = `
+Object {
+  "appID": "app-id",
+  "name": undefined,
+  "pingInterval": 5000,
+  "public": "public",
+  "reconnectionAttemps": 10,
+  "reconnectionDelay": 3000,
+  "secret": "secret",
+  "subprotocol": "subprotocol",
+}
+`;

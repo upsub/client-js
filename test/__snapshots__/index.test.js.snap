@@ -1,0 +1,9 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`Should export the Client 1`] = `[Function]`;
+
+exports[`Should export the Client 2`] = `
+Object {
+  "default": [Function],
+}
+`;
