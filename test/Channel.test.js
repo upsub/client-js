@@ -21,10 +21,11 @@ afterEach(done => {
   server.close(() => done())
 })
 
-test('Should create a new channel', () => {
+test('Should create a new channel', done => {
   const channel = new Channel(['channel-1', 'channel-2'], client)
   expect(channel._channels).toEqual(['channel-1', 'channel-2'])
   expect(channel._client).toBe(client)
+  done()
 })
 
 test('Should register channel with listener', done => {

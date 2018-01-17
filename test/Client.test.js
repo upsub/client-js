@@ -28,9 +28,10 @@ afterEach(done => {
   server.close(() => done())
 })
 
-test('Should set options', () => {
+test('Should set options', done => {
   expect(client1._options).toMatchSnapshot()
   expect(client2._options).toMatchSnapshot()
+  done()
 })
 
 test('Should send ping message and receive pong', done => {

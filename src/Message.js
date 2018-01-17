@@ -50,8 +50,15 @@ export default class Message {
    * @return {Message}
    */
   static decode (message) {
-    const { headers, payload = null } = JSON.parse(message)
-    return new Message(headers, JSON.parse(payload))
+    let { headers, payload } = JSON.parse(message)
+
+    try {
+      payload = JSON.parse(payload)
+    } catch (err) {
+      payload = ''
+    }
+
+    return new Message(headers, payload)
   }
 
   /**

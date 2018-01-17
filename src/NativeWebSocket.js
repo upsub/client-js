@@ -14,6 +14,10 @@ export default class NativeWebSocket extends EventEmitter {
     return true
   }
 
+  get readyState () {
+    return this._connection.readyState
+  }
+
   /**
    * Create a new NativeWebSocket
    * @param {String} host
@@ -26,7 +30,7 @@ export default class NativeWebSocket extends EventEmitter {
     this._host = host
     this._subprotocol = subprotocol
     this._options = options
-    this._connection = this.connect()
+    this._connection = this._connect()
     this._listen()
   }
 
@@ -44,7 +48,7 @@ export default class NativeWebSocket extends EventEmitter {
    */
   _listen () {
     this._connection.onopen = event => this.emit('open', event)
-    this._connection.onmessage = event => this.emit('message', event)
+    this._connection.onmessage = event => this.emit('message', event.data)
     this._connection.onclose = event => this.emit('close', event)
     this._connection.onerror = event => this.emit('error', event)
   }

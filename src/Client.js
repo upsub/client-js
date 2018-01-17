@@ -24,7 +24,6 @@ export default class Client extends EventEmitter {
     super()
     this._host = host
     this._subscriptions = []
-    this._state = CLOSED
     this._connection = null
     this._connectionAttemps = 0
     this._setDefaultOptions(options)

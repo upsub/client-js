@@ -8,7 +8,9 @@
     "test:watch": "jest --watch",
     "lint": "standard | snazzy; exit 0",
     "lint:fix": "standard --fix | snazzy; exit 0",
-    "build": "babel src/ -D -d ./lib; exit 0",
+    "build": "npm run build:lib && npm run build:browser",
+    "build:lib": "babel src/ -D -d ./lib --plugins=transform-es2015-modules-commonjs; exit 0",
+    "build:browser": "rollup -c && uglifyjs dist/client.js -m -o dist/client.min.js",
     "build:watch": "babel src/ -D -d ./lib --watch",
     "coverage": "jest --coverage && cat ./coverage/lcov.info | coveralls",
     "prepublish": "npm run build && npm test"
@@ -40,26 +42,37 @@
   "engines": {
     "node": ">=6"
   },
+  "dependencies": {
+    "ws": "^4.0.0"
+  },
   "devDependencies": {
     "babel-cli": "^6.24.1",
     "babel-jest": "^22.1.0",
-    "babel-plugin-transform-es2015-modules-commonjs": "^6.24.1",
+    "babel-plugin-external-helpers": "^6.22.0",
+    "babel-preset-env": "^1.6.1",
     "coveralls": "^3.0.0",
-    "jest": "^22.1.1",
-    "rollup": "^0.54.0",
+    "jest": "^22.1.2",
+    "rollup": "^0.54.1",
+    "rollup-plugin-alias": "^1.4.0",
     "rollup-plugin-babel": "^3.0.2",
     "rollup-plugin-commonjs": "^8.2.6",
+    "rollup-plugin-node-builtins": "^2.1.2",
     "rollup-watch": "^4.3.1",
     "snazzy": "^7.0.0",
-    "standard": "^10.0.2"
+    "standard": "^10.0.2",
+    "uglify-js": "^3.3.7"
   },
   "jest": {
+    "transform": {
+      "^.+\\.js$": "babel-jest"
+    },
     "modulePaths": [
       "src"
     ],
-    "coveragePathIgnorePatterns" : ["node_modules/", "test/util/"]
-  },
-  "dependencies": {
-    "ws": "^4.0.0"
+    "coveragePathIgnorePatterns": [
+      "lib/",
+      "node_modules/",
+      "test/util/"
+    ]
   }
 }

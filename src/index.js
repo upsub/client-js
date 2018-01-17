@@ -1,3 +1,6 @@
 import Client from './Client'
 export default Client
-module.exports = Client
+
+if (typeof module === 'object' && typeof module.exports === 'object') {
+  module.exports = Client
+}

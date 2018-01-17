@@ -1,3 +1,15 @@
 {
-  "plugins": ["transform-es2015-modules-commonjs"]
+  "env": {
+    "test": {
+      "presets": ["env"]
+    },
+    "production": {
+      "plugins": [
+        "external-helpers"
+      ],
+    }
+  },
+  "presets": [
+    ["env", { "modules": false }]
+  ],
 }
