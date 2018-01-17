@@ -26,6 +26,9 @@ export default class Client extends EventEmitter {
     this._subscriptions = []
     this._connection = null
     this._connectionAttemps = 0
+    this._pingInterval = null
+    this._pongTimeout = null
+    this._reconnectionInterval = null
     this._setDefaultOptions(options)
     this._connect()
   }
@@ -41,10 +44,9 @@ export default class Client extends EventEmitter {
     this._options.public = options.public
     this._options.secret = options.secret
     this._options.subprotocol = options.subprotocol
-    this._options.reconnectionAttemps = options.reconnectionAttemps
     this._options.reconnectionDelay = options.reconnectionDelay || 2000
     this._options.pingInterval = options.pingInterval || 30000
-    this._options.pongTimeout = options.pongTimeout || 30000
+    this._options.pongTimeout = options.pongTimeout || 5000
   }
 
   /**
@@ -55,6 +57,7 @@ export default class Client extends EventEmitter {
       this._host + this._createQueryString()
     )
     this._connectionAttemps++
+    this._startPingInterval()
     this._listen()
   }
 
@@ -75,6 +78,36 @@ export default class Client extends EventEmitter {
     )
 
     return `?${query.reduce(createQuery, []).join('&')}`
+  }
+
+  /**
+   * Start the ping interval and pong timeout
+   */
+  _startPingInterval () {
+    const setPongTimeout = () => {
+      this._pongTimeout = setTimeout(
+        () => this.close(),
+        this._options.pongTimeout
+      )
+    }
+
+    this._pingInterval = setInterval(
+      () => {
+        this.ping()
+        setPongTimeout()
+      },
+      this._options.pingInterval
+    )
+  }
+
+  /**
+   * Clear ping interval and pong timeout
+   */
+  _clearPingInterval () {
+    if (this._pingInterval) {
+      this._pingInterval = clearInterval(this._pingInterval)
+      this._pongTimeout = clearTimeout(this._pongTimeout)
+    }
   }
 
   /**
@@ -104,12 +137,11 @@ export default class Client extends EventEmitter {
     const message = Message.decode(event)
 
     if (message.type === Message.PONG) {
-      this.emit('pong')
+      this._pongTimeout = clearTimeout(this._pongTimeout)
       return
     }
 
     if (message.type === Message.PING) {
-      this.emit('ping')
       this._sendMessage(Message.pong())
       return
     }
