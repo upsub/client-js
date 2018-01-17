@@ -1,6 +1,6 @@
 /**
- * Wrap the native Websocket implementation for browsers into a FayeWebSocket
- * api structure. The FayeWebSocket module is replaced with this implementation
+ * Wrap the native Websocket implementation for browsers into a ws module
+ * api structure. The ws module is replaced with this implementation
  * on build time.
  */
 import EventEmitter from 'events'
@@ -14,6 +14,10 @@ export default class NativeWebSocket extends EventEmitter {
     return true
   }
 
+  /**
+   * Get current connection state
+   * @return {Number}
+   */
   get readyState () {
     return this._connection.readyState
   }
