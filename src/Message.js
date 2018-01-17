@@ -55,7 +55,7 @@ export default class Message {
     try {
       payload = JSON.parse(payload)
     } catch (err) {
-      payload = ''
+      payload = undefined
     }
 
     return new Message(headers, payload)
