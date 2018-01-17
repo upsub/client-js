@@ -3,6 +3,7 @@
  * api structure. The ws module is replaced with this implementation
  * on build time.
  */
+/* global WebSocket */
 import EventEmitter from 'events'
 
 export default class NativeWebSocket extends EventEmitter {
@@ -43,7 +44,7 @@ export default class NativeWebSocket extends EventEmitter {
    * @return {WebSocket}
    */
   _connect () {
-    return new window.WebSocket(this._host, this._subprotocol)
+    return new WebSocket(this._host, this._subprotocol)
   }
 
   /**
