@@ -64,6 +64,7 @@ export default class Client extends EventEmitter {
     this._connection = new WebSocket(
       this._host + this._createQueryString()
     )
+
     this._connectionAttemps++
     this._startPingInterval()
     this._listen()
@@ -302,6 +303,7 @@ export default class Client extends EventEmitter {
    * @param  {String} reason
    */
   close (code, reason) {
+    this._clearPingInterval()
     this._connection.close(code, reason)
   }
 
