@@ -17,10 +17,9 @@ export default class Client extends EventEmitter {
    * Create a new Client instance
    * @param {String} host
    * @param {Object} options
-   * @param {Object} deps
    * @return {Client}
    */
-  constructor (host, options = {}, deps = {}) {
+  constructor (host, options = {}) {
     super()
     this._host = host
     this._subscriptions = []
