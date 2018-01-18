@@ -53,12 +53,31 @@ export default class Client extends EventEmitter {
    * Establish a new connection to the websocket server
    */
   _connect () {
+    if (this._reconnectionInterval) {
+      this._reconnectionInterval = clearInterval(this._reconnectionInterval)
+    }
+
+    if (this._connection && this.isConnected) {
+      return
+    }
+
     this._connection = new WebSocket(
       this._host + this._createQueryString()
     )
     this._connectionAttemps++
     this._startPingInterval()
     this._listen()
+  }
+
+  /**
+   * Reconnect to the WebSocket server
+   */
+  _reconnect (forced = true) {
+    if (forced && this.isConnected) {
+      this.close()
+    }
+
+    this._connect()
   }
 
   /**
@@ -86,7 +105,7 @@ export default class Client extends EventEmitter {
   _startPingInterval () {
     const setPongTimeout = () => {
       this._pongTimeout = setTimeout(
-        () => this.close(),
+        () => this._reconnect(),
         this._options.pongTimeout
       )
     }
@@ -155,6 +174,15 @@ export default class Client extends EventEmitter {
    */
   _onClose (event) {
     this.emit('disconnect', event)
+
+    if (this.isClosed) {
+      return
+    }
+
+    this._reconnectionInterval = setInterval(
+      () => this._reconnect(false),
+      this._options.reconnectionDelay
+    )
   }
 
   /**
