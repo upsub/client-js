@@ -146,6 +146,7 @@ export default class Client extends EventEmitter {
    */
   _onOpen (event) {
     this.emit('connect', event)
+    this._subscribe(...this._subscriptions)
   }
 
   /**
@@ -254,8 +255,19 @@ export default class Client extends EventEmitter {
    * @param  {String} channels
    */
   _subscribe (...channels) {
+    if (channels.length === 0) {
+      return
+    }
+
     this._sendMessage(Message.subscribe(...channels))
-    this._subscriptions = this._subscriptions.concat(channels)
+
+    for (const channel of channels) {
+      if (this._subscriptions.includes(channel)) {
+        continue
+      }
+
+      this._subscriptions.push(channel)
+    }
   }
 
   /**
