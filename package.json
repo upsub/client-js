@@ -74,5 +74,8 @@
       "node_modules/",
       "test/util/"
     ]
+  },
+  "publishConfig": {
+    "access": "public"
   }
 }
