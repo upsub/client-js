@@ -19,9 +19,11 @@ export default class Channel {
    */
   on (channel, listener) {
     for (const prefix of this._channels) {
-      const c = `${prefix}/${channel}`
-      this._subscriptions.push(c)
-      this._client.on(c, listener)
+      this._client.on(`${prefix}/${channel}`, listener)
+    }
+
+    if (!this._subscriptions.includes(channel)) {
+      this._subscriptions.push(channel)
     }
 
     return this
@@ -35,9 +37,13 @@ export default class Channel {
   off (channel) {
     for (const prefix of this._channels) {
       this._subscriptions = this._subscriptions.filter(
-        c => c !== `${prefix}/${channel}`
+        c => c !== channel
       )
       this._client.off(`${prefix}/${channel}`)
+    }
+
+    if (this._subscriptions.includes(channel)) {
+      this.unsubscribe(channel)
     }
 
     return this
@@ -55,11 +61,30 @@ export default class Channel {
   }
 
   /**
-   * Unsubscribe from channel and remove all its event listeners
+   * Unsubscribe from channels and remove all its listeners
+   * @param {String} channels
    */
-  unsubscribe () {
-    this._client._unsubscribe(...this._subscriptions)
-    this._subscriptions = []
+  unsubscribe (...channels) {
+    if (this._subscriptions.length === 0) {
+      return
+    }
+
+    if (channels.length === 0) {
+      this.unsubscribe(...this._subscriptions)
+      return
+    }
+
+    this._subscriptions = this._subscriptions.filter(
+      sub => !channels.find(chan => chan === sub)
+    )
+
+    this._client.unsubscribe(...channels.reduce((channels, channel) => {
+      for (const prefix of this._channels) {
+        channels.push(`${prefix}/${channel}`)
+      }
+
+      return channels
+    }, []))
   }
 
   /**

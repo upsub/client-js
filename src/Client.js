@@ -244,7 +244,10 @@ export default class Client extends EventEmitter {
   off (channel) {
     if (this._events[channel]) {
       delete this._events[channel]
-      this._unsubscribe(channel)
+    }
+
+    if (this._subscriptions.includes(channel)) {
+      this.unsubscribe(channel)
     }
 
     return this
@@ -274,20 +277,25 @@ export default class Client extends EventEmitter {
    * unsubscribe to channels
    * @param  {String} channels
    */
-  _unsubscribe (...channels) {
-    if (channels.length === 0) {
-      this.unsubscribe(...this.subscriptions)
+  unsubscribe (...channels) {
+    if (this._subscriptions.length === 0) {
       return
     }
+
+    if (channels.length === 0) {
+      this.unsubscribe(...this._subscriptions)
+      return
+    }
+
+    this._subscriptions = this._subscriptions.filter(
+      sub => !channels.find(chan => chan === sub)
+    )
 
     for (const channel of channels) {
       this.off(channel)
     }
 
     this._sendMessage(Message.unsubscribe(...channels))
-    this._subscriptions = this._subscriptions.filter(
-      sub => !channels.find(chan => chan === sub)
-    )
   }
 
   /**
