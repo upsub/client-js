@@ -16,7 +16,7 @@
     "prepublish": "npm run build && npm test"
   },
   "main": "lib/index.js",
-  "module": "src/index.js",
+  "module": "dist/client.js",
   "files": [
     "lib",
     "dist",
