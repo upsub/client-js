@@ -158,6 +158,7 @@ export default class Client extends EventEmitter {
 
     if (message.type === Message.PONG) {
       this._pongTimeout = clearTimeout(this._pongTimeout)
+      this.emit('pong')
       return
     }
 

@@ -47,7 +47,7 @@ export default port => {
     })
   })
 
-  server.on('error', () => {})
+  server.on('error', err => console.log(err))
 
   return server
 }

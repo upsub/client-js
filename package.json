@@ -4,8 +4,8 @@
   "version": "0.0.0",
   "license": "MIT",
   "scripts": {
-    "test": "npm run lint && jest --coverage",
-    "test:watch": "jest --watch",
+    "test": "npm run lint && jest --runInBand --coverage",
+    "test:watch": "jest --runInBand --watch",
     "lint": "standard | snazzy; exit 0",
     "lint:fix": "standard --fix | snazzy; exit 0",
     "build": "npm run build:lib && npm run build:browser",
