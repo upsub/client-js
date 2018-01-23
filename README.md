@@ -7,7 +7,7 @@
 [![Standard - JavaScript Style Guide](https://img.shields.io/badge/code%20style-standard-brightgreen.svg)](http://standardjs.com/)
 [![gzip size](http://img.badgesize.io/https://unpkg.com/@upsub/client/dist/client.min.js?compression=gzip)](https://unpkg.com/@upsub/client/dist/client.min.js)
 
-This is the JavaScript client for UpSub.
+This is the JavaScript client for UpSub, its supports `node`, `browser` and `web worker` environments.
 
 ## Install
 ```sh
