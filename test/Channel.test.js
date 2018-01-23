@@ -30,7 +30,7 @@ test('Should create a new channel', done => {
 
 test('Should register channel with listener', done => {
   server.expect(['subscribe'], () => {
-    expect(channel.subscriptions.includes('channel/test')).toBe(true)
+    expect(channel.subscriptions.includes('test')).toBe(true)
     expect(client.subscriptions.includes('channel/test')).toBe(true)
     expect(Object.keys(client._events).includes('channel/test')).toBe(true)
     done()

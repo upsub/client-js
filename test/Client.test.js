@@ -35,7 +35,7 @@ test('Should set options', done => {
 })
 
 test('Should send ping message and receive pong', done => {
-  client1.on('pong', done)
+  client1.on('pong', () => done())
   client1.ping()
 })
 
@@ -58,16 +58,12 @@ test('Should unregister channel and listener', done => {
   client1.off('some-channel')
 })
 
-// test('Should subscribe to channel', () => {
-//   client1.subscribe('my-channel')
-//   expect(client1.subscriptions.includes('my-channel')).toBe(true)
-// })
-//
-// test('Should unsubscribe from channel', () => {
-//   client1.subscribe('my-channel')
-//   client1.unsubscribe('my-channel')
-//   expect(client1.subscriptions.includes('my-channel')).toBe(false)
-// })
+test('Should unsubscribe from channel', () => {
+  client1.on('my-channel', () => {})
+  client1.unsubscribe('my-channel')
+  expect(client1.subscriptions.includes('my-channel')).toBe(false)
+  expect(Object.keys(client1._events).includes('my-channel')).toBe(false)
+})
 
 test('Should send a text message', done => {
   client2.on('some-channel', msg => {
