@@ -12,7 +12,7 @@
     "build:lib": "babel src/ -D -d ./lib --plugins=transform-es2015-modules-commonjs; exit 0",
     "build:browser": "export NODE_ENV=production && rollup -c && uglifyjs dist/client.js -m -o dist/client.min.js && unset NODE_ENV",
     "build:watch": "babel src/ -D -d ./lib --watch",
-    "coverage": "jest --coverage && cat ./coverage/lcov.info | coveralls",
+    "coverage": "jest --runInBand --coverage && cat ./coverage/lcov.info | coveralls",
     "prepublish": "npm run build && npm test"
   },
   "main": "lib/index.js",
