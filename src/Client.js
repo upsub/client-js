@@ -65,7 +65,6 @@ export default class Client extends EventEmitter {
     )
 
     this._connectionAttemps++
-    this._startPingInterval()
     this._listen()
   }
 
@@ -77,7 +76,15 @@ export default class Client extends EventEmitter {
       this.close()
     }
 
-    this._connect()
+    if (this._reconnectionInterval) {
+      return
+    }
+
+    this._clearPingInterval()
+    this._reconnectionInterval = setInterval(
+      () => this._connect(),
+      this._options.reconnectionDelay
+    )
   }
 
   /**
@@ -137,7 +144,7 @@ export default class Client extends EventEmitter {
     this._connection.on('message', this._onMessage.bind(this))
     this._connection.on('close', this._onClose.bind(this))
     this._connection.on('error', this._onError.bind(this))
-    this.on('error', () => {})
+    this.on('error', () => this._reconnect())
   }
 
   /**
@@ -146,6 +153,7 @@ export default class Client extends EventEmitter {
    */
   _onOpen (event) {
     this.emit('connect', event)
+    this._startPingInterval()
     this._subscribe(...this._subscriptions)
   }
 
@@ -181,10 +189,7 @@ export default class Client extends EventEmitter {
       return
     }
 
-    this._reconnectionInterval = setInterval(
-      () => this._reconnect(false),
-      this._options.reconnectionDelay
-    )
+    this._reconnect()
   }
 
   /**
