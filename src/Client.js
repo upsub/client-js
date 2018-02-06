@@ -144,7 +144,10 @@ export default class Client extends EventEmitter {
     this._connection.on('message', this._onMessage.bind(this))
     this._connection.on('close', this._onClose.bind(this))
     this._connection.on('error', this._onError.bind(this))
-    this.on('error', () => this._reconnect())
+
+    if (!this._events.error) {
+      this.on('error', () => this._reconnect())
+    }
   }
 
   /**
