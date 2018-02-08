@@ -178,7 +178,13 @@ export default class Client extends EventEmitter {
       return
     }
 
-    this.emit(message.headers['upsub-channel'], message.payload)
+    if (!message.headers['upsub-channel']) {
+      return
+    }
+
+    for (const channel of message.headers['upsub-channel'].split(',')) {
+      this.emit(channel, message.payload)
+    }
   }
 
   /**
