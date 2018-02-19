@@ -1,5 +1,15 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
+exports[`Should send and receive a text message 1`] = `
+Message {
+  "headers": Object {
+    "upsub-channel": "some-channel",
+    "upsub-message-type": "text",
+  },
+  "payload": "message",
+}
+`;
+
 exports[`Should set options 1`] = `
 Object {
   "appID": undefined,
