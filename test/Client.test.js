@@ -14,7 +14,8 @@ beforeEach(done => {
     subprotocol: 'subprotocol',
     reconnectionAttemps: 10,
     reconnectionDelay: 3000,
-    pingInterval: 5000
+    pingInterval: 5000,
+    subscriptionTimeout: 3000
   })
 
   client1.on('connect', () => {
@@ -40,12 +41,13 @@ test('Should send ping message and receive pong', done => {
 })
 
 test('Should register channel with listener', done => {
-  server.expect(['subscribe'], () => {
+  client1.on('some-channel', () => {})
+  client1.on('some-channel:subscribed', () => {
+    client1.off('some-channel:subscribed')
     expect(Object.keys(client1._events).includes('some-channel')).toBe(true)
     expect(client1.subscriptions.includes('some-channel')).toBe(true)
     done()
   })
-  client1.on('some-channel', () => {})
 })
 
 test('Should not send subscription to server if listener is containing an action', done => {
@@ -70,20 +72,29 @@ test('Should unregister channel and listeners', done => {
   client1.off('some-channel')
 })
 
-test('Should unregister remove specific listener', () => {
+test('Should remove specific listener', done => {
   const listener = () => {}
   client1.on('channel', () => {})
   client1.on('channel', listener)
-  client1.off('channel', listener)
-  expect(client1._events['channel'].length).toBe(1)
-  expect(client1._subscriptions.includes('channel')).toBe(true)
+  client1.on('channel:subscribed', () => {
+    client1.off('channel:subscribed')
+    client1.off('channel', listener)
+    expect(client1._events['channel'].length).toBe(1)
+    expect(client1._subscriptions.includes('channel')).toBe(true)
+    done()
+  })
 })
 
-test('Should unsubscribe from channel', () => {
+test('Should unsubscribe from channel', done => {
   client1.on('my-channel', () => {})
-  client1.unsubscribe('my-channel')
-  expect(client1.subscriptions.includes('my-channel')).toBe(false)
-  expect(Object.keys(client1._events).includes('my-channel')).toBe(false)
+  client1.on('my-channel:subscribed', () => {
+    client1.unsubscribe('my-channel')
+    client1.on('my-channel:unsubscribed', () => {
+      expect(client1.subscriptions.includes('my-channel')).toBe(false)
+      expect(Object.keys(client1._events).includes('my-channel')).toBe(false)
+      done()
+    })
+  })
 })
 
 test('Should send and receive a text message', done => {
@@ -92,7 +103,9 @@ test('Should send and receive a text message', done => {
     expect(msg).toMatchSnapshot()
     done()
   })
-  client1.send('some-channel', 'message')
+  client2.on('some-channel:subscribed', () => {
+    client1.send('some-channel', 'message')
+  })
 })
 
 test('Should close connection', done => {
@@ -104,9 +117,12 @@ test('Should close connection', done => {
   expect(client1.isClosing).toBe(true)
 })
 
-test('Should export subscriptions', () => {
+test('Should export subscriptions', done => {
   client1.on('test', () => {})
-  expect(client1.subscriptions).toEqual(['test'])
+  client1.on('test:subscribed', () => {
+    expect(client1.subscriptions).toEqual(['test'])
+    done()
+  })
 })
 
 test('Should have isConnecting, isConnected, isClosing, isClosed flags', () => {

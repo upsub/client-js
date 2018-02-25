@@ -32,14 +32,15 @@ export default class Channel {
   /**
    * Unregister channel and listeners
    * @param  {String} channel
+   * @param  {Function} listener
    * @return {Channel}
    */
-  off (channel) {
+  off (channel, listener) {
     for (const prefix of this._channels) {
       this._subscriptions = this._subscriptions.filter(
         c => c !== channel
       )
-      this._client.off(`${prefix}/${channel}`)
+      this._client.off(`${prefix}/${channel}`, listener)
     }
 
     if (this._subscriptions.includes(channel)) {

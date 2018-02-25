@@ -39,6 +39,32 @@ export default port => {
         return
       }
 
+      if (decoded.headers['upsub-message-type'] === 'subscribe') {
+        for (const channel of decoded.payload.split(',')) {
+          ws.send(JSON.stringify({
+            headers: {
+              'upsub-message-type': 'text',
+              'upsub-channel': channel + ':subscribed'
+            },
+            payload: JSON.stringify(channel + ':subscribed')
+          }))
+        }
+        return
+      }
+
+      if (decoded.headers['upsub-message-type'] === 'unsubscribe') {
+        for (const channel of decoded.payload.split(',')) {
+          ws.send(JSON.stringify({
+            headers: {
+              'upsub-message-type': 'text',
+              'upsub-channel': channel + ':unsubscribed'
+            },
+            payload: JSON.stringify(channel + ':unsubscribed')
+          }))
+        }
+        return
+      }
+
       server.clients.forEach(client => {
         if (client !== ws && client.readyState === WebSocket.OPEN) {
           client.send(message)
