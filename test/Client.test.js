@@ -52,7 +52,7 @@ test(`Should throw error if .on second argument isn't a function`, () => {
   expect(() => client1.on('test', 'not a function...')).toThrowErrorMatchingSnapshot()
 })
 
-test('Should unregister channel and listener', done => {
+test('Should unregister channel and listeners', done => {
   server.expect(['subscribe', 'unsubscribe'], () => {
     expect(Object.keys(client1._events).includes('some-channel')).toBe(false)
     expect(client1.subscriptions.includes('some-channel')).toBe(false)
@@ -60,6 +60,15 @@ test('Should unregister channel and listener', done => {
   })
   client1.on('some-channel', () => {})
   client1.off('some-channel')
+})
+
+test('Should unregister remove specific listener', () => {
+  const listener = () => {}
+  client1.on('channel', () => {})
+  client1.on('channel', listener)
+  client1.off('channel', listener)
+  expect(client1._events['channel'].length).toBe(1)
+  expect(client1._subscriptions.includes('channel')).toBe(true)
 })
 
 test('Should unsubscribe from channel', () => {

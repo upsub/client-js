@@ -236,7 +236,7 @@ export default class Client extends EventEmitter {
    */
   on (channel, listener) {
     if (typeof listener !== 'function') {
-      throw new Error('Second argument should be a function')
+      throw new TypeError('Second argument should be a function')
     }
 
     if (this._events[channel]) {
@@ -258,14 +258,25 @@ export default class Client extends EventEmitter {
   /**
    * Unregister channel and send unsubscribe event
    * @param  {String} channel
+   * @param  {Function} listener
    * @return {Client}
    */
-  off (channel) {
-    if (this._events[channel]) {
+  off (channel, listener) {
+    if (listener && typeof listener !== 'function') {
+      throw new TypeError('Second argument should be a function')
+    }
+
+    if (!this._events[channel]) {
+      return this
+    }
+
+    if (listener) {
+      this._events[channel] = this._events[channel].filter(l => l !== listener)
+    } else {
       delete this._events[channel]
     }
 
-    if (this._subscriptions.includes(channel)) {
+    if (this._subscriptions.includes(channel) && !this._events[channel]) {
       this.unsubscribe(channel)
     }
 
