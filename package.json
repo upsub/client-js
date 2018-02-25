@@ -1,7 +1,7 @@
 {
   "name": "@upsub/client",
   "description": "JavaScript client for UpSub. A High performance Pub/Sub messaging server for the Web & Cloud.",
-  "version": "0.1.5",
+  "version": "0.1.6",
   "license": "MIT",
   "scripts": {
     "test": "npm run lint && jest --runInBand --coverage",
