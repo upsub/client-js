@@ -46,6 +46,7 @@ export default class Client extends EventEmitter {
     this._options.reconnectionDelay = options.reconnectionDelay || 2000
     this._options.pingInterval = options.pingInterval || 30000
     this._options.pongTimeout = options.pongTimeout || 5000
+    this._options.subscriptionTimeout = options.subscriptionTimeout || 2000
   }
 
   /**
@@ -235,6 +236,10 @@ export default class Client extends EventEmitter {
    * @return {Client}
    */
   on (channel, listener) {
+    if (typeof listener !== 'function') {
+      throw new TypeError('Second argument should be a function')
+    }
+
     if (this._events[channel]) {
       this._events[channel].push(listener)
     } else {
@@ -243,7 +248,8 @@ export default class Client extends EventEmitter {
 
     if (
       !this._subscriptions.includes(channel) &&
-      !RESERVED_CHANNELS.includes(channel)
+      !RESERVED_CHANNELS.includes(channel) &&
+      !channel.includes(':')
     ) {
       this._subscribe(channel)
     }
@@ -254,14 +260,29 @@ export default class Client extends EventEmitter {
   /**
    * Unregister channel and send unsubscribe event
    * @param  {String} channel
+   * @param  {Function} listener
    * @return {Client}
    */
-  off (channel) {
-    if (this._events[channel]) {
+  off (channel, listener) {
+    if (listener && typeof listener !== 'function') {
+      throw new TypeError('Second argument should be a function')
+    }
+
+    if (!this._events[channel]) {
+      return this
+    }
+
+    if (listener && this._events[channel].length > 1) {
+      this._events[channel] = this._events[channel].filter(l => l !== listener)
+    } else {
       delete this._events[channel]
     }
 
-    if (this._subscriptions.includes(channel)) {
+    if (
+      this._subscriptions.includes(channel) &&
+      !this._events[channel] &&
+      !channel.includes(':')
+    ) {
       this.unsubscribe(channel)
     }
 
@@ -280,11 +301,23 @@ export default class Client extends EventEmitter {
     this._sendMessage(Message.subscribe(...channels))
 
     for (const channel of channels) {
+      let listener
+      let timeout = setTimeout(
+        () => this._subscribe(channel),
+        this._options.subscriptionTimeout
+      )
+
+      listener = () => {
+        timeout = clearTimeout(timeout)
+        this._subscriptions.push(channel)
+        this.off(channel + ':subscribed', listener)
+      }
+
+      this.on(channel + ':subscribed', listener)
+
       if (this._subscriptions.includes(channel)) {
         continue
       }
-
-      this._subscriptions.push(channel)
     }
   }
 
@@ -302,12 +335,24 @@ export default class Client extends EventEmitter {
       return
     }
 
-    this._subscriptions = this._subscriptions.filter(
-      sub => !channels.find(chan => chan === sub)
-    )
-
     for (const channel of channels) {
-      this.off(channel)
+      let listener
+      let timeout = setTimeout(
+        () => this.unsubscribe(channel),
+        this._options.subscriptionTimeout
+      )
+
+      listener = () => {
+        timeout = clearTimeout(timeout)
+        this._subscriptions = this._subscriptions.filter(c => c !== channel)
+        this.off(channel + ':unsubscribed', listener)
+      }
+
+      this.on(channel + ':unsubscribed', listener)
+
+      if (this._events[channel]) {
+        this.off(channel)
+      }
     }
 
     this._sendMessage(Message.unsubscribe(...channels))

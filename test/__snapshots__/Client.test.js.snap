@@ -20,6 +20,7 @@ Object {
   "reconnectionDelay": 2000,
   "secret": undefined,
   "subprotocol": undefined,
+  "subscriptionTimeout": 2000,
 }
 `;
 
@@ -33,5 +34,8 @@ Object {
   "reconnectionDelay": 3000,
   "secret": "secret",
   "subprotocol": "subprotocol",
+  "subscriptionTimeout": 3000,
 }
 `;
+
+exports[`Should throw error if .on second argument isn't a function 1`] = `"Second argument should be a function"`;

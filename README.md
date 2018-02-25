@@ -32,6 +32,7 @@ const client = new Client('ws://localhost:4400', {
 - `reconnectionDelay: Number`: Delay between client reconnection attemps, default `2000` ms.  
 - `pingInterval: Number`: The client will fire a ping message to the dispatcher each interval, default `30000` ms (30s).
 - `pongTimeout: Number`: The client should receive a pong message within the timeout, the client will try to reconnect otherwise.
+- `subscriptionTimeout: Number`: If the dispatcher doesn't send a subscription acknowledgement back within the timeout `2000` ms default, then the client will notify the server again.
 
 #### Subscribe to channels
 The best way to structure event streams is by scoping events to a specific or multiple channels.
