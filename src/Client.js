@@ -235,6 +235,10 @@ export default class Client extends EventEmitter {
    * @return {Client}
    */
   on (channel, listener) {
+    if (typeof listener !== 'function') {
+      throw new Error('Second argument should be a function')
+    }
+
     if (this._events[channel]) {
       this._events[channel].push(listener)
     } else {

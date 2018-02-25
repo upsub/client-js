@@ -48,6 +48,10 @@ test('Should register channel with listener', done => {
   client1.on('some-channel', () => {})
 })
 
+test(`Should throw error if .on second argument isn't a function`, () => {
+  expect(() => client1.on('test', 'not a function...')).toThrowErrorMatchingSnapshot()
+})
+
 test('Should unregister channel and listener', done => {
   server.expect(['subscribe', 'unsubscribe'], () => {
     expect(Object.keys(client1._events).includes('some-channel')).toBe(false)

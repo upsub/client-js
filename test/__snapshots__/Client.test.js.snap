@@ -35,3 +35,5 @@ Object {
   "subprotocol": "subprotocol",
 }
 `;
+
+exports[`Should throw error if .on second argument isn't a function 1`] = `"Second argument should be a function"`;
