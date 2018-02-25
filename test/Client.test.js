@@ -48,6 +48,14 @@ test('Should register channel with listener', done => {
   client1.on('some-channel', () => {})
 })
 
+test('Should not send subscription to server if listener is containing an action', done => {
+  server.expect(['text'], () => {
+    done()
+  })
+  client1.on('channel:action', () => {})
+  client1.send('message', 'test')
+})
+
 test(`Should throw error if .on second argument isn't a function`, () => {
   expect(() => client1.on('test', 'not a function...')).toThrowErrorMatchingSnapshot()
 })

@@ -247,7 +247,8 @@ export default class Client extends EventEmitter {
 
     if (
       !this._subscriptions.includes(channel) &&
-      !RESERVED_CHANNELS.includes(channel)
+      !RESERVED_CHANNELS.includes(channel) &&
+      !channel.includes(':')
     ) {
       this._subscribe(channel)
     }
