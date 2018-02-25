@@ -183,7 +183,7 @@ export default class Client extends EventEmitter {
     }
 
     for (const channel of message.headers['upsub-channel'].split(',')) {
-      this.emit(channel, message.payload)
+      this.emit(channel, message.payload, message)
     }
   }
 

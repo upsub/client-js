@@ -65,9 +65,10 @@ test('Should unsubscribe from channel', () => {
   expect(Object.keys(client1._events).includes('my-channel')).toBe(false)
 })
 
-test('Should send a text message', done => {
-  client2.on('some-channel', msg => {
-    expect(msg).toBe('message')
+test('Should send and receive a text message', done => {
+  client2.on('some-channel', (payload, msg) => {
+    expect(payload).toBe('message')
+    expect(msg).toMatchSnapshot()
     done()
   })
   client1.send('some-channel', 'message')
