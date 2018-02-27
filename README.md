@@ -2,9 +2,6 @@
 
 [![npm version](https://img.shields.io/npm/v/@upsub/client.svg)](https://www.npmjs.com/package/@upsub/client)
 [![Build Status](https://travis-ci.org/upsub/client-js.svg?branch=master)](https://travis-ci.org/upsub/client-js)
-[![Coverage Status](https://coveralls.io/repos/github/upsub/client-js/badge.svg?branch=master)](https://coveralls.io/github/upsub/client-js?branch=master)
-[![Dependency Status](https://david-dm.org/upsub/client.svg)](https://david-dm.org/upsub/client-js)
-[![Standard - JavaScript Style Guide](https://img.shields.io/badge/code%20style-standard-brightgreen.svg)](http://standardjs.com/)
 [![gzip size](http://img.badgesize.io/https://unpkg.com/@upsub/client/dist/client.min.js?compression=gzip)](https://unpkg.com/@upsub/client/dist/client.min.js)
 
 This is the JavaScript client for UpSub, its supports `node`, `browser` and `web worker` environments.
