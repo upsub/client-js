@@ -15,7 +15,8 @@ beforeEach(done => {
     reconnectionAttemps: 10,
     reconnectionDelay: 3000,
     pingInterval: 5000,
-    subscriptionTimeout: 3000
+    subscriptionTimeout: 3000,
+    requestTimeout: 2000
   })
 
   client1.on('connect', () => {
@@ -123,6 +124,28 @@ test('Should export subscriptions', done => {
     expect(client1.subscriptions).toEqual(['test'])
     done()
   })
+})
+
+test('Should create a request and subscribe for a response', done => {
+  client2.on('channel/event', (payload, msg, reply) => reply('response data...'))
+  client1.request('channel/event', 'data')
+    .then(res => {
+      setTimeout(() => {
+        expect(client1.subscriptions).toMatchSnapshot()
+        expect(client1._events).toMatchSnapshot()
+        expect(res).toBe('response data...')
+        done()
+      }, 100)
+    })
+})
+
+test('Should throw error if request times out', done => {
+  client1._options.requestTimeout = 100
+  client1.request('channel', 'data')
+    .catch(err => {
+      expect(err).toMatchSnapshot()
+      done()
+    })
 })
 
 test('Should have isConnecting, isConnected, isClosing, isClosed flags', () => {

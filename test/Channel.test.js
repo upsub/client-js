@@ -61,6 +61,20 @@ test('Should send a message on the channel', done => {
   channel.send('test', 'data')
 })
 
+test('Should create a request from a channel', done => {
+  receiver.on('channel/some-event', (payload, msg, reply) => reply('response...'))
+  channel.request('some-event', 'data')
+    .then(res => {
+      expect(res).toBe('response...')
+      done()
+    })
+})
+
+test('Should throw error if request is send on multiple channels at once', () => {
+  const multi = client.channel('test-1', 'test-2')
+  expect(() => multi.request('test', 'hello')).toThrowErrorMatchingSnapshot()
+})
+
 test('Should unsubscribe channel subscriptions', done => {
   client.on('test', () => {})
   channel.on('test', () => {})

@@ -62,6 +62,20 @@ export default class Channel {
   }
 
   /**
+   * Send a new request
+   * @param  {String} channel
+   * @param  {Mixed} payload
+   * @return {Promise}         [description]
+   */
+  request (channel, payload) {
+    if (this._channels.length > 1) {
+      throw new Error('Can only send request on a single channel at once')
+    }
+
+    return this._client.request(`${this._channels[0]}/${channel}`, payload)
+  }
+
+  /**
    * Unsubscribe from channels and remove all its listeners
    * @param {String} channels
    */
