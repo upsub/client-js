@@ -309,7 +309,9 @@ export default class Client extends EventEmitter {
 
       listener = () => {
         timeout = clearTimeout(timeout)
-        this._subscriptions.push(channel)
+        if (!this._subscriptions.includes(channel)) {
+          this._subscriptions.push(channel)
+        }
         this.off(channel + ':subscribed', listener)
       }
 
