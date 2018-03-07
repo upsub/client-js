@@ -91,6 +91,21 @@ channel.send('some-event', { hello: 'world!' })
 client.send('some-event', 'message')
 ```
 
+#### Send request
+Send a request message on a channel to another listening client, the receiving client
+should send a response back or the sender will throw an Error.
+```js
+// Send request
+client.request('channel', { key: 'value' })
+  .then(res => console.log(res))
+  .catch(err => console.log(err)) // Nobody sent a response back
+
+// Send response back
+client.on('channel', (payload, msg, reply) => {
+  reply('Send some data back...')
+})
+```
+
 #### Close connection
 ```js
 client.close()
