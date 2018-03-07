@@ -46,6 +46,7 @@ export default class Client extends EventEmitter {
     this._options.reconnectionDelay = options.reconnectionDelay || 2000
     this._options.pingInterval = options.pingInterval || 30000
     this._options.pongTimeout = options.pongTimeout || 5000
+    this._options.requestTimeout = options.requestTimeout || 5000
     this._options.subscriptionTimeout = options.subscriptionTimeout || 2000
   }
 
@@ -183,8 +184,16 @@ export default class Client extends EventEmitter {
       return
     }
 
+    const reply = payload => {
+      if (!message.headers['upsub-response-channel']) {
+        console.warn('Can only reply on request messages')
+      }
+
+      this.send(message.headers['upsub-response-channel'], payload)
+    }
+
     for (const channel of message.headers['upsub-channel'].split(',')) {
-      this.emit(channel, message.payload, message)
+      this.emit(channel, message.payload, message, reply)
     }
   }
 
@@ -376,6 +385,40 @@ export default class Client extends EventEmitter {
    */
   send (channel, payload) {
     this._sendMessage(Message.text(channel, payload))
+  }
+
+  /**
+   * Send a request message
+   * @param  {String} channel
+   * @param  {Mixed} payload
+   * @return {Promise}
+   */
+  request (channel, payload) {
+    const msg = Message.text(channel, payload)
+    const responseChannel = msg.headers['upsub-channel'] + '/response-' + Math.random().toString(36).substr(2, 9)
+    msg.headers['upsub-response-channel'] = responseChannel
+
+    return new Promise((resolve, reject) => {
+      let timeout
+
+      // Start timeout when the the dispatcher subscribes to the response
+      this.on(responseChannel + ':subscribed', () => {
+        timeout = setTimeout(
+          () => reject(new Error(`Request timeout, didn't receive response from client`)),
+          this._options.requestTimeout
+        )
+
+        this._sendMessage(msg)
+      })
+
+      // listen for response
+      this.on(responseChannel, payload => {
+        this.off(responseChannel + ':subscribed')
+        this.off(responseChannel)
+        resolve(payload)
+        timeout = clearTimeout(timeout)
+      })
+    })
   }
 
   /**

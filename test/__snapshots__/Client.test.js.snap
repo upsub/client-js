@@ -1,5 +1,18 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
+exports[`Should create a request and subscribe for a response 1`] = `Array []`;
+
+exports[`Should create a request and subscribe for a response 2`] = `
+Object {
+  "connect": Array [
+    [Function],
+  ],
+  "error": Array [
+    [Function],
+  ],
+}
+`;
+
 exports[`Should send and receive a text message 1`] = `
 Message {
   "headers": Object {
@@ -18,6 +31,7 @@ Object {
   "pongTimeout": 5000,
   "public": undefined,
   "reconnectionDelay": 2000,
+  "requestTimeout": 5000,
   "secret": undefined,
   "subprotocol": undefined,
   "subscriptionTimeout": 2000,
@@ -32,6 +46,7 @@ Object {
   "pongTimeout": 5000,
   "public": "public",
   "reconnectionDelay": 3000,
+  "requestTimeout": 2000,
   "secret": "secret",
   "subprotocol": "subprotocol",
   "subscriptionTimeout": 3000,
@@ -39,3 +54,5 @@ Object {
 `;
 
 exports[`Should throw error if .on second argument isn't a function 1`] = `"Second argument should be a function"`;
+
+exports[`Should throw error if request times out 1`] = `[Error: Request timeout, didn't receive response from client]`;

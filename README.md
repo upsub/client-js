@@ -30,6 +30,7 @@ const client = new Client('ws://localhost:4400', {
 - `pingInterval: Number`: The client will fire a ping message to the dispatcher each interval, default `30000` ms (30s).
 - `pongTimeout: Number`: The client should receive a pong message within the timeout, the client will try to reconnect otherwise.
 - `subscriptionTimeout: Number`: If the dispatcher doesn't send a subscription acknowledgement back within the timeout `2000` ms default, then the client will notify the server again.
+- `requestTimeout: Number`: Request should receive a response within the given time otherwise reject, default is `5000` ms.
 
 #### Subscribe to channels
 The best way to structure event streams is by scoping events to a specific or multiple channels.
@@ -88,6 +89,21 @@ channel.send('some-event', { hello: 'world!' })
 
 // Send message directly from the client instance
 client.send('some-event', 'message')
+```
+
+#### Send request
+Send a request message on a channel to another listening client, the receiving client
+should send a response back or the sender will throw an Error.
+```js
+// Send request
+client.request('channel', { key: 'value' })
+  .then(res => console.log(res))
+  .catch(err => console.log(err)) // Nobody sent a response back
+
+// Send response back
+client.on('channel', (payload, msg, reply) => {
+  reply('Send some data back...')
+})
 ```
 
 #### Close connection
