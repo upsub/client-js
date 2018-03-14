@@ -34,7 +34,7 @@ export default class Message {
    * @return {String}
    */
   encode () {
-    let msg = `${this._type} ${this._channel || ''}`
+    let msg = `${this._type} ${this._channel || ''}`.trim()
     let payload = this.payload
 
     for (const key in this.headers) {
