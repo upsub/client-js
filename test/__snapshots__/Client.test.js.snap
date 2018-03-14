@@ -15,10 +15,9 @@ Object {
 
 exports[`Should send and receive a text message 1`] = `
 Message {
-  "headers": Object {
-    "upsub-channel": "some-channel",
-    "upsub-message-type": "text",
-  },
+  "_channel": "some-channel",
+  "_type": "text",
+  "headers": Object {},
   "payload": "message",
 }
 `;

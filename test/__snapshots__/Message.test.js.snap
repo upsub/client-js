@@ -2,11 +2,13 @@
 
 exports[`Should create a batch message 1`] = `
 Message {
-  "headers": Object {
-    "upsub-message-type": "batch",
-  },
+  "_channel": "",
+  "_type": "batch",
+  "headers": Object {},
   "payload": Array [
     Message {
+      "_channel": "channel",
+      "_type": "text",
       "headers": Object {},
       "payload": undefined,
     },
@@ -16,6 +18,8 @@ Message {
 
 exports[`Should create a new message 1`] = `
 Message {
+  "_channel": "channel",
+  "_type": "text",
   "headers": Object {
     "header-key": "value",
   },
@@ -27,75 +31,79 @@ Message {
 
 exports[`Should create a ping message 1`] = `
 Message {
-  "headers": Object {
-    "upsub-message-type": "ping",
-  },
+  "_channel": undefined,
+  "_type": "ping",
+  "headers": Object {},
   "payload": undefined,
 }
 `;
 
 exports[`Should create a pong message 1`] = `
 Message {
-  "headers": Object {
-    "upsub-message-type": "pong",
-  },
+  "_channel": undefined,
+  "_type": "pong",
+  "headers": Object {},
   "payload": undefined,
 }
 `;
 
 exports[`Should create a subscribe message 1`] = `
 Message {
-  "headers": Object {
-    "upsub-message-type": "subscribe",
-  },
+  "_channel": "",
+  "_type": "subscribe",
+  "headers": Object {},
   "payload": "channel",
 }
 `;
 
 exports[`Should create a subscribe message 2`] = `
 Message {
-  "headers": Object {
-    "upsub-message-type": "subscribe",
-  },
+  "_channel": "",
+  "_type": "subscribe",
+  "headers": Object {},
   "payload": "channel,channel-2",
 }
 `;
 
 exports[`Should create a text message 1`] = `
 Message {
-  "headers": Object {
-    "upsub-channel": "channel",
-    "upsub-message-type": "text",
-  },
+  "_channel": "channel",
+  "_type": "text",
+  "headers": Object {},
   "payload": "data",
 }
 `;
 
 exports[`Should create an unsubscribe message 1`] = `
 Message {
-  "headers": Object {
-    "upsub-message-type": "unsubscribe",
-  },
+  "_channel": "",
+  "_type": "unsubscribe",
+  "headers": Object {},
   "payload": "channel",
 }
 `;
 
 exports[`Should create an unsubscribe message 2`] = `
 Message {
-  "headers": Object {
-    "upsub-message-type": "unsubscribe",
-  },
+  "_channel": "",
+  "_type": "unsubscribe",
+  "headers": Object {},
   "payload": "channel,channel-2",
 }
 `;
 
-exports[`Should encode message to string format 1`] = `"{\\"headers\\":{\\"header-key\\":\\"header-value\\"},\\"payload\\":\\"\\\\\\"data\\\\\\"\\"}"`;
+exports[`Should encode message to string format 1`] = `
+"text channel
+header-key: header-value
+
+payload"
+`;
 
 exports[`Should parse a string and create a new message 1`] = `
 Message {
-  "headers": Object {
-    "upsub-message-type": "text",
-  },
-  "payload": "data",
+  "_channel": "channel",
+  "_type": "text",
+  "headers": Object {},
+  "payload": "payload",
 }
 `;

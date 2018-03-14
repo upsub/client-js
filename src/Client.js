@@ -181,7 +181,7 @@ export default class Client extends EventEmitter {
       return
     }
 
-    if (!message.headers['upsub-channel']) {
+    if (!message.channel) {
       return
     }
 
@@ -193,7 +193,7 @@ export default class Client extends EventEmitter {
       this.send(message.headers['upsub-response-channel'], payload)
     }
 
-    for (const channel of message.headers['upsub-channel'].split(',')) {
+    for (const channel of message.channel.split(',')) {
       this.emit(channel, message.payload, message, reply)
     }
   }
@@ -250,7 +250,7 @@ export default class Client extends EventEmitter {
       throw new TypeError('Second argument should be a function')
     }
 
-    if (channel.includes(" ")) {
+    if (channel.includes(' ')) {
       throw new Error(`Channel can't include spaces`)
     }
 
@@ -400,7 +400,7 @@ export default class Client extends EventEmitter {
    */
   request (channel, payload) {
     const msg = Message.text(channel, payload)
-    const responseChannel = msg.headers['upsub-channel'] + '/response-' + Math.random().toString(36).substr(2, 9)
+    const responseChannel = msg.channel + '/response-' + Math.random().toString(36).substr(2, 9)
     msg.headers['upsub-response-channel'] = responseChannel
 
     return new Promise((resolve, reject) => {
