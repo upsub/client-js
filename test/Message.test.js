@@ -34,7 +34,7 @@ test('Should parse a string and create a new message', () => {
 })
 
 test('Should create a batch message', () => {
-  const msg = Message.batch(new Message("text", "channel"))
+  const msg = Message.batch(new Message('text', 'channel'))
   expect(msg).toMatchSnapshot()
 })
 
