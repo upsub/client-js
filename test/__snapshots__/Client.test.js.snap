@@ -33,7 +33,6 @@ Object {
   "reconnectionDelay": 2000,
   "requestTimeout": 5000,
   "secret": undefined,
-  "subprotocol": undefined,
   "subscriptionTimeout": 2000,
 }
 `;
@@ -48,7 +47,6 @@ Object {
   "reconnectionDelay": 3000,
   "requestTimeout": 2000,
   "secret": "secret",
-  "subprotocol": "subprotocol",
   "subscriptionTimeout": 3000,
 }
 `;
