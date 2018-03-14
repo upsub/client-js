@@ -148,6 +148,12 @@ test('Should throw error if request times out', done => {
     })
 })
 
+test('Should throw error if channel includes spaces', () => {
+  expect(() => {
+    client1.on('should fail', () => {})
+  }).toThrowErrorMatchingSnapshot()
+})
+
 test('Should have isConnecting, isConnected, isClosing, isClosed flags', () => {
   expect(client1.isConnecting).toBe(false)
   expect(client1.isConnected).toBe(true)

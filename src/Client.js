@@ -250,6 +250,10 @@ export default class Client extends EventEmitter {
       throw new TypeError('Second argument should be a function')
     }
 
+    if (channel.includes(" ")) {
+      throw new Error(`Channel can't include spaces`)
+    }
+
     if (this._events[channel]) {
       this._events[channel].push(listener)
     } else {

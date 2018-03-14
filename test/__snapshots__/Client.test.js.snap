@@ -53,4 +53,6 @@ Object {
 
 exports[`Should throw error if .on second argument isn't a function 1`] = `"Second argument should be a function"`;
 
+exports[`Should throw error if channel includes spaces 1`] = `"Channel can't include spaces"`;
+
 exports[`Should throw error if request times out 1`] = `[Error: Request timeout, didn't receive response from client]`;
