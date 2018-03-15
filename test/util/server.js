@@ -1,5 +1,23 @@
 import WebSocket from 'ws'
 
+function parse (message) {
+  const [head, body] = message.split(/\n\s*\n/)
+  const [type, channel = ''] = head.split('\n')[0].split(' ')
+  const headers = {}
+
+  for (const header of head.split('\n')) {
+    const [key, value = ''] = header.split(':')
+    headers[key] = value.trim()
+  }
+
+  return {
+    type: type,
+    channel: channel,
+    header: headers,
+    payload: body
+  }
+}
+
 export default port => {
   const server = new WebSocket.Server({ port: 3999 })
 
@@ -16,16 +34,13 @@ export default port => {
   server.on('connection', ws => {
     ws.on('message', message => {
       server.emit('received')
-      const decoded = JSON.parse(message)
-      if (decoded.payload) {
-        decoded.payload = JSON.parse(decoded.payload)
-      }
+      const decoded = parse(message)
 
       server.received.push(decoded)
       let received = true
 
       for (const msg of server.received) {
-        if (!server.expects.includes(msg.headers['upsub-message-type'])) {
+        if (!server.expects.includes(msg.type)) {
           received = false
         }
       }
@@ -34,33 +49,21 @@ export default port => {
         server.onSuccess()
       }
 
-      if (decoded.headers['upsub-message-type'] === 'ping') {
-        ws.send(JSON.stringify({ headers: { 'upsub-message-type': 'pong' } }))
+      if (decoded.type === 'ping') {
+        ws.send('pong')
         return
       }
 
-      if (decoded.headers['upsub-message-type'] === 'subscribe') {
+      if (decoded.type === 'subscribe') {
         for (const channel of decoded.payload.split(',')) {
-          ws.send(JSON.stringify({
-            headers: {
-              'upsub-message-type': 'text',
-              'upsub-channel': channel + ':subscribed'
-            },
-            payload: JSON.stringify(channel + ':subscribed')
-          }))
+          ws.send(`text ${channel}:subscribed\n\n${channel}`)
         }
         return
       }
 
-      if (decoded.headers['upsub-message-type'] === 'unsubscribe') {
+      if (decoded.type === 'unsubscribe') {
         for (const channel of decoded.payload.split(',')) {
-          ws.send(JSON.stringify({
-            headers: {
-              'upsub-message-type': 'text',
-              'upsub-channel': channel + ':unsubscribed'
-            },
-            payload: JSON.stringify(channel + ':unsubscribed')
-          }))
+          ws.send(`text ${channel}:unsubscribed\n\n${channel}`)
         }
         return
       }

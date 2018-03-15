@@ -1,10 +1,14 @@
 export default class Message {
   /**
    * Create a new message instance
+   * @param {String} type
+   * @param {String} channel
    * @param {Object} headers
    * @param {Mixed} payload
    */
-  constructor (headers = {}, payload) {
+  constructor (type, channel, headers = {}, payload) {
+    this._type = type
+    this._channel = channel
     this.headers = headers
     this.payload = payload
   }
@@ -14,15 +18,15 @@ export default class Message {
    * @return {String}
    */
   get type () {
-    return this.headers['upsub-message-type']
+    return this._type
   }
 
   /**
-   * Set header upsub-message-type
-   * @param  {String} value
+   * Get header upsub-message-type and return its value
+   * @return {String}
    */
-  set type (value) {
-    this.headers['upsub-message-type'] = value
+  get channel () {
+    return this._channel
   }
 
   /**
@@ -30,10 +34,24 @@ export default class Message {
    * @return {String}
    */
   encode () {
-    return JSON.stringify({
-      headers: this.headers,
-      payload: JSON.stringify(this.payload)
-    })
+    let msg = `${this._type} ${this._channel || ''}`.trim()
+    let payload = this.payload
+
+    for (const key in this.headers) {
+      msg += `\n${key}: ${this.headers[key]}`
+    }
+
+    if (payload) {
+      msg += '\n\n'
+    }
+
+    if (this._type === Message.JSON) {
+      payload = JSON.stringify(this.payload)
+    }
+
+    msg += payload || ''
+
+    return msg
   }
 
   /**
@@ -50,15 +68,28 @@ export default class Message {
    * @return {Message}
    */
   static decode (message) {
-    let { headers, payload } = JSON.parse(message)
+    const [head, body = ''] = message.split(/\n\s*\n/)
+    const msg = new Message()
 
-    try {
-      payload = JSON.parse(payload)
-    } catch (err) {
-      payload = undefined
+    for (const header of head.split('\n')) {
+      if (!msg.type && !msg.channel) {
+        const [type, channel = ''] = header.split(' ')
+        msg._type = type
+        msg._channel = channel
+        continue
+      }
+
+      const [key, value = ''] = header.split(':')
+      msg.headers[key] = value.trim()
     }
 
-    return new Message(headers, payload)
+    if (msg.type === Message.JSON) {
+      msg.payload = JSON.parse(body)
+    } else {
+      msg.payload = body
+    }
+
+    return msg
   }
 
   /**
@@ -67,11 +98,7 @@ export default class Message {
    * @return {Message}
    */
   static batch (...messages) {
-    const headers = {
-      'upsub-message-type': Message.BATCH
-    }
-
-    return new Message(headers, messages)
+    return new Message(Message.BATCH, '', {}, messages)
   }
 
   /**
@@ -79,11 +106,7 @@ export default class Message {
    * @return {Message}
    */
   static ping () {
-    const headers = {
-      'upsub-message-type': Message.PING
-    }
-
-    return new Message(headers)
+    return new Message(Message.PING)
   }
 
   /**
@@ -91,11 +114,7 @@ export default class Message {
    * @return {Message}
    */
   static pong () {
-    const headers = {
-      'upsub-message-type': Message.PONG
-    }
-
-    return new Message(headers)
+    return new Message(Message.PONG)
   }
 
   /**
@@ -105,11 +124,21 @@ export default class Message {
    * @return {Message}
    */
   static text (channel, payload) {
-    const headers = {
-      'upsub-message-type': Message.TEXT,
-      'upsub-channel': channel
+    if (typeof payload !== 'string') {
+      return Message.json(channel, payload)
     }
-    return new Message(headers, payload)
+
+    return new Message(Message.TEXT, channel, {}, payload)
+  }
+
+  /**
+   * Create a new text message
+   * @param  {String} channel
+   * @param  {Mixed} payload
+   * @return {Message}
+   */
+  static json (channel, payload) {
+    return new Message(Message.JSON, channel, {}, payload)
   }
 
   /**
@@ -118,10 +147,7 @@ export default class Message {
    * @return {Message}
    */
   static subscribe (...channels) {
-    const headers = {
-      'upsub-message-type': Message.SUBSCRIBE
-    }
-    return new Message(headers, channels.join(','))
+    return new Message(Message.SUBSCRIBE, '', {}, channels.join(','))
   }
 
   /**
@@ -130,11 +156,7 @@ export default class Message {
    * @return {Message}
    */
   static unsubscribe (...channels) {
-    const headers = {
-      'upsub-message-type': Message.UNSUBSCRIBE
-    }
-
-    return new Message(headers, channels.join(','))
+    return new Message(Message.UNSUBSCRIBE, '', {}, channels.join(','))
   }
 
   /**
@@ -142,6 +164,13 @@ export default class Message {
    */
   static get TEXT () {
     return 'text'
+  }
+
+  /**
+   * Message type TEXT
+   */
+  static get JSON () {
+    return 'json'
   }
 
   /**

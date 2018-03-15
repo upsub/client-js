@@ -15,10 +15,9 @@ Object {
 
 exports[`Should send and receive a text message 1`] = `
 Message {
-  "headers": Object {
-    "upsub-channel": "some-channel",
-    "upsub-message-type": "text",
-  },
+  "_channel": "some-channel",
+  "_type": "text",
+  "headers": Object {},
   "payload": "message",
 }
 `;
@@ -33,7 +32,6 @@ Object {
   "reconnectionDelay": 2000,
   "requestTimeout": 5000,
   "secret": undefined,
-  "subprotocol": undefined,
   "subscriptionTimeout": 2000,
 }
 `;
@@ -48,11 +46,12 @@ Object {
   "reconnectionDelay": 3000,
   "requestTimeout": 2000,
   "secret": "secret",
-  "subprotocol": "subprotocol",
   "subscriptionTimeout": 3000,
 }
 `;
 
 exports[`Should throw error if .on second argument isn't a function 1`] = `"Second argument should be a function"`;
+
+exports[`Should throw error if channel includes spaces 1`] = `"Channel can't include spaces"`;
 
 exports[`Should throw error if request times out 1`] = `[Error: Request timeout, didn't receive response from client]`;

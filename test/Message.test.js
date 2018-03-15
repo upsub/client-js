@@ -2,41 +2,39 @@
 import Message from 'Message'
 
 test('Should create a new message', () => {
-  const msg = new Message({ 'header-key': 'value' }, { key: 'value' })
+  const msg = new Message(
+    Message.TEXT,
+    'channel',
+    { 'header-key': 'value' },
+    { key: 'value' }
+  )
   expect(msg).toMatchSnapshot()
 })
 
-test('msg.type should return message type from header', () => {
-  const msg = new Message({ 'upsub-message-type': 'text' })
+test('msg.type should return specified message type', () => {
+  const msg = new Message(Message.TEXT)
   expect(msg.type).toBe('text')
 })
 
-test('Should set new message type through msg.type = "text"', () => {
-  const msg = new Message()
-  msg.type = 'batch'
-  expect(msg.type).toBe('batch')
-  expect(msg.headers).toEqual({ 'upsub-message-type': 'batch' })
-})
-
 test('Should encode message to string format', () => {
-  const msg = new Message({ 'header-key': 'header-value' }, 'data')
+  const msg = new Message(
+    Message.TEXT,
+    'channel',
+    { 'header-key': 'header-value' },
+    'payload'
+  )
   expect(msg.encode()).toMatchSnapshot()
   expect(msg.toString()).toEqual(msg.encode())
 })
 
 test('Should parse a string and create a new message', () => {
-  const msg = Message.decode(
-    JSON.stringify({
-      headers: { 'upsub-message-type': 'text' },
-      payload: JSON.stringify('data')
-    })
-  )
+  const msg = Message.decode(`text channel\n\npayload`)
 
   expect(msg).toMatchSnapshot()
 })
 
 test('Should create a batch message', () => {
-  const msg = Message.batch(new Message())
+  const msg = Message.batch(new Message('text', 'channel'))
   expect(msg).toMatchSnapshot()
 })
 
