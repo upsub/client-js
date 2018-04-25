@@ -49,7 +49,7 @@ test('Should register channel with listener', done => {
   client1.on('some-channel', () => {})
   client1.on('some-channel:subscribed', () => {
     client1.off('some-channel:subscribed')
-    expect(Object.keys(client1._events).includes('some-channel')).toBe(true)
+    expect(Object.keys(client1._emitter._events).includes('some-channel')).toBe(true)
     expect(client1.subscriptions.includes('some-channel')).toBe(true)
     done()
   })
@@ -69,7 +69,7 @@ test(`Should throw error if .on second argument isn't a function`, () => {
 
 test('Should unregister channel and listeners', done => {
   server.expect(['subscribe', 'unsubscribe'], () => {
-    expect(Object.keys(client1._events).includes('some-channel')).toBe(false)
+    expect(Object.keys(client1._emitter._events).includes('some-channel')).toBe(false)
     expect(client1.subscriptions.includes('some-channel')).toBe(false)
     done()
   })
@@ -79,15 +79,12 @@ test('Should unregister channel and listeners', done => {
 
 test('Should remove specific listener', done => {
   const listener = () => {}
-  client1.on('channel', () => {})
-  client1.on('channel', listener)
-  client1.on('channel:subscribed', () => {
-    client1.off('channel:subscribed')
-    client1.off('channel', listener)
-    expect(client1._events['channel'].length).toBe(1)
-    expect(client1._subscriptions.includes('channel')).toBe(true)
-    done()
-  })
+  const otherListener = () => {}
+  client1._emitter.on('channel', listener)
+  client1._emitter.on('channel', otherListener)
+  client1.off('channel', listener)
+  expect(client1._emitter._events['channel']).toBe(otherListener)
+  done()
 })
 
 test('Should unsubscribe from channel', done => {
@@ -96,7 +93,7 @@ test('Should unsubscribe from channel', done => {
     client1.unsubscribe('my-channel')
     client1.on('my-channel:unsubscribed', () => {
       expect(client1.subscriptions.includes('my-channel')).toBe(false)
-      expect(Object.keys(client1._events).includes('my-channel')).toBe(false)
+      expect(Object.keys(client1._emitter._events).includes('my-channel')).toBe(false)
       done()
     })
   })
@@ -136,7 +133,7 @@ test('Should create a request and subscribe for a response', done => {
     .then(res => {
       setTimeout(() => {
         expect(client1.subscriptions).toMatchSnapshot()
-        expect(client1._events).toMatchSnapshot()
+        expect(client1._emitter._events).toMatchSnapshot()
         expect(res).toBe('response data...')
         done()
       }, 100)

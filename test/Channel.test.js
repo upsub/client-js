@@ -32,7 +32,7 @@ test('Should register channel with listener', done => {
   let listener = () => {
     expect(channel.subscriptions.includes('test')).toBe(true)
     expect(client.subscriptions.includes('channel/test')).toBe(true)
-    expect(Object.keys(client._events).includes('channel/test')).toBe(true)
+    expect(Object.keys(client._emitter._events).includes('channel/test')).toBe(true)
     done()
   }
   channel.on('test', () => {})
@@ -46,7 +46,7 @@ test('Should unregister channel and listener', done => {
   server.expect(['subscribe', 'unsubscribe'], () => {
     expect(channel.subscriptions.includes('channel/test')).toBe(false)
     expect(client.subscriptions.includes('channel/test')).toBe(false)
-    expect(Object.keys(client._events).includes('channel/test')).toBe(false)
+    expect(Object.keys(client._emitter._events).includes('channel/test')).toBe(false)
     done()
   })
   channel.on('test', () => {})
@@ -84,7 +84,7 @@ test('Should unsubscribe channel subscriptions', done => {
       channel.off('test:unsubscribed')
       expect(channel.subscriptions).toEqual([])
       expect(client.subscriptions).toEqual(['test'])
-      expect(Object.keys(client._events).includes('channel/test')).toBe(false)
+      expect(Object.keys(client._emitter._events).includes('channel/test')).toBe(false)
       done()
     })
   })

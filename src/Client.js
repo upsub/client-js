@@ -10,9 +10,14 @@ const CONNECTING = 0
 const CONNECTED = 1
 const CLOSING = 2
 const CLOSED = 3
+
+/**
+ * Reserved channels
+ * @type {Array}
+ */
 const RESERVED_CHANNELS = ['connect', 'disconnect', 'error', 'subscribe', 'unsubscribe']
 
-export default class Client extends EventEmitter {
+export default class Client {
   /**
    * Create a new Client instance
    * @param {String} host
@@ -20,7 +25,6 @@ export default class Client extends EventEmitter {
    * @return {Client}
    */
   constructor (host, options = {}) {
-    super()
     this._host = host
     this._subscriptions = []
     this._connection = null
@@ -29,6 +33,7 @@ export default class Client extends EventEmitter {
     this._pongTimeout = null
     this._reconnectionInterval = null
     this._protocol = '1.0'
+    this._emitter = new EventEmitter()
     this._setDefaultOptions(options)
     this._connect()
   }
@@ -156,7 +161,7 @@ export default class Client extends EventEmitter {
     this._connection.on('close', this._onClose.bind(this))
     this._connection.on('error', this._onError.bind(this))
 
-    if (!this._events.error) {
+    if (!this._emitter._events.error) {
       this.on('error', () => this._reconnect())
     }
   }
@@ -166,7 +171,7 @@ export default class Client extends EventEmitter {
    * @param  {Object} event
    */
   _onOpen (event) {
-    this.emit('connect', event)
+    this._emitter.emit('connect', event)
     this._startPingInterval()
     this._subscribe(...this._subscriptions)
   }
@@ -180,7 +185,7 @@ export default class Client extends EventEmitter {
 
     if (message.type === Message.PONG) {
       this._pongTimeout = clearTimeout(this._pongTimeout)
-      this.emit('pong')
+      this._emitter.emit('pong')
       return
     }
 
@@ -202,7 +207,7 @@ export default class Client extends EventEmitter {
     }
 
     for (const channel of message.channel.split(',')) {
-      this.emit(channel, message.payload, message, reply)
+      this._emitter.emit(channel, message.payload, message, reply)
     }
   }
 
@@ -211,7 +216,7 @@ export default class Client extends EventEmitter {
    * @param  {Object} event
    */
   _onClose (event) {
-    this.emit('disconnect', event)
+    this._emitter.emit('disconnect', event)
 
     if (this.isClosed) {
       return
@@ -225,7 +230,7 @@ export default class Client extends EventEmitter {
    * @param  {Object} event
    */
   _onError (event) {
-    this.emit('error', event)
+    this._emitter.emit('error', event)
   }
 
   /**
@@ -262,11 +267,7 @@ export default class Client extends EventEmitter {
       throw new Error(`Channel can't include spaces`)
     }
 
-    if (this._events[channel]) {
-      this._events[channel].push(listener)
-    } else {
-      this._events[channel] = [listener]
-    }
+    this._emitter.on(channel, listener)
 
     if (
       !this._subscriptions.includes(channel) &&
@@ -290,19 +291,19 @@ export default class Client extends EventEmitter {
       throw new TypeError('Second argument should be a function')
     }
 
-    if (!this._events[channel]) {
+    if (!this._emitter._events[channel]) {
       return this
     }
 
-    if (listener && this._events[channel].length > 1) {
-      this._events[channel] = this._events[channel].filter(l => l !== listener)
+    if (listener && this._emitter._events[channel].length > 1) {
+      this._emitter.removeListener(channel, listener)
     } else {
-      delete this._events[channel]
+      this._emitter.removeAllListeners(channel)
     }
 
     if (
       this._subscriptions.includes(channel) &&
-      !this._events[channel] &&
+      !this._emitter._events[channel] &&
       !channel.includes(':')
     ) {
       this.unsubscribe(channel)
@@ -374,7 +375,7 @@ export default class Client extends EventEmitter {
 
       this.on(channel + ':unsubscribed', listener)
 
-      if (this._events[channel]) {
+      if (this._emitter._events[channel]) {
         this.off(channel)
       }
     }

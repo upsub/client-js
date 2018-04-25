@@ -4,12 +4,8 @@ exports[`Should create a request and subscribe for a response 1`] = `Array []`;
 
 exports[`Should create a request and subscribe for a response 2`] = `
 Object {
-  "connect": Array [
-    [Function],
-  ],
-  "error": Array [
-    [Function],
-  ],
+  "connect": [Function],
+  "error": [Function],
 }
 `;
 
