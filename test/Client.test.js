@@ -36,6 +36,10 @@ test('Should set options', done => {
   done()
 })
 
+test('Should throw if connection name contains spaces', () => {
+  expect(() => new Client('', { name: 'hello world' })).toThrowErrorMatchingSnapshot()
+})
+
 test('Should send ping message and receive pong', done => {
   client1.on('pong', () => done())
   client1.ping()

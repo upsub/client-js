@@ -38,8 +38,16 @@ export default class Client extends EventEmitter {
    * @param {Object} options
    */
   _setDefaultOptions (options) {
+    const valid = name => {
+      if (name && name.includes(' ')) {
+        throw new Error('The connection name can not contain spaces')
+      }
+
+      return name
+    }
+
     this._options = {}
-    this._options.name = options.name
+    this._options.name = valid(options.name)
     this._options.appID = options.appID
     this._options.public = options.public
     this._options.secret = options.secret
