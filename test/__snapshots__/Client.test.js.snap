@@ -55,3 +55,5 @@ exports[`Should throw error if .on second argument isn't a function 1`] = `"Seco
 exports[`Should throw error if channel includes spaces 1`] = `"Channel can't include spaces"`;
 
 exports[`Should throw error if request times out 1`] = `[Error: Request timeout, didn't receive response from client]`;
+
+exports[`Should throw if connection name contains spaces 1`] = `"The connection name can not contain spaces"`;
