@@ -47,7 +47,7 @@
     "node": ">=6"
   },
   "dependencies": {
-    "ws": "^4.0.0"
+    "ws": "^5.1.1"
   },
   "devDependencies": {
     "babel-cli": "^6.24.1",
@@ -57,14 +57,12 @@
     "coveralls": "^3.0.0",
     "jest": "^22.1.2",
     "nyc": "^11.4.1",
-    "rollup": "^0.55.0",
+    "rollup": "^0.58.2",
     "rollup-plugin-alias": "^1.4.0",
     "rollup-plugin-babel": "^3.0.2",
-    "rollup-plugin-commonjs": "^8.2.6",
-    "rollup-plugin-node-builtins": "^2.1.2",
     "rollup-watch": "^4.3.1",
     "snazzy": "^7.0.0",
-    "standard": "^10.0.2",
+    "standard": "^11.0.1",
     "uglify-js": "^3.3.7"
   },
   "jest": {
