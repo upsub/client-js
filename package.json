@@ -9,7 +9,7 @@
     "lint": "standard | snazzy; exit 0",
     "lint:fix": "standard --fix | snazzy; exit 0",
     "build": "npm run build:lib && npm run build:browser",
-    "build:lib": "babel src/ -D -d ./lib --plugins=transform-es2015-modules-commonjs; exit 0",
+    "build:lib": "babel src/ -D -d ./lib --plugins=@babel/plugin-transform-modules-commonjs; exit 0",
     "build:browser": "export NODE_ENV=production && rollup -c && uglifyjs dist/client.js -m -o dist/client.min.js && unset NODE_ENV",
     "build:watch": "babel src/ -D -d ./lib --watch",
     "coverage": "jest --runInBand --coverage && cat ./coverage/lcov.info | coveralls",
@@ -47,25 +47,28 @@
     "node": ">=6"
   },
   "dependencies": {
-    "ws": "^4.0.0"
+    "ws": "^6.1.2"
   },
   "devDependencies": {
-    "babel-cli": "^6.24.1",
-    "babel-jest": "^22.1.0",
-    "babel-plugin-external-helpers": "^6.22.0",
-    "babel-preset-env": "^1.7.0",
-    "coveralls": "^3.0.0",
-    "jest": "^22.1.2",
-    "nyc": "^13.0.1",
-    "rollup": "^0.55.0",
-    "rollup-plugin-alias": "^1.4.0",
-    "rollup-plugin-babel": "^3.0.2",
-    "rollup-plugin-commonjs": "^8.2.6",
+    "@babel/cli": "^7.2.3",
+    "@babel/core": "^7.2.2",
+    "@babel/plugin-external-helpers": "^7.2.0",
+    "@babel/plugin-transform-modules-commonjs": "^7.2.0",
+    "@babel/preset-env": "^7.2.3",
+    "babel-core": "7.0.0-bridge.0",
+    "babel-jest": "^23.6.0",
+    "coveralls": "^3.0.2",
+    "jest": "^23.6.0",
+    "nyc": "^13.1.0",
+    "rollup": "^0.68.2",
+    "rollup-plugin-alias": "^1.5.1",
+    "rollup-plugin-babel": "^4.1.0",
+    "rollup-plugin-commonjs": "^9.2.0",
     "rollup-plugin-node-builtins": "^2.1.2",
     "rollup-watch": "^4.3.1",
-    "snazzy": "^7.0.0",
-    "standard": "^10.0.2",
-    "uglify-js": "^3.3.7"
+    "snazzy": "^8.0.0",
+    "standard": "^12.0.1",
+    "uglify-js": "^3.4.9"
   },
   "jest": {
     "transform": {
