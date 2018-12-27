@@ -397,7 +397,11 @@ export default class Client extends EventEmitter {
    * @param  {Mixed} payload
    */
   send (channel, payload) {
-    this._sendMessage(Message.text(channel, payload))
+    this._sendMessage(
+      typeof payload !== 'string'
+        ? Message.json(channel, payload)
+        : Message.text(channel, payload)
+    )
   }
 
   /**

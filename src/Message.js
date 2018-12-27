@@ -120,14 +120,10 @@ export default class Message {
   /**
    * Create a new text message
    * @param  {String} channel
-   * @param  {Mixed} payload
+   * @param  {String} payload
    * @return {Message}
    */
   static text (channel, payload) {
-    if (typeof payload !== 'string') {
-      return Message.json(channel, payload)
-    }
-
     return new Message(Message.TEXT, channel, {}, payload)
   }
 
